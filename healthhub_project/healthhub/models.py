@@ -47,9 +47,12 @@ class Aktywnosc(models.Model):
             return f"{self.rodzaj_aktywnosci} – {self.uzytkownik.username}"
 
 class Leki(models.Model):
-    uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
-    nazwa = models.CharField(max_length=100)
-    dawka = models.CharField(max_length=100)
+        uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+        nazwa = models.CharField(max_length=100)
+        dawka = models.CharField(max_length=100)
 
-    def __str__(self):
-        return f"{self.nazwa} – {self.uzytkownik.username}"
+        def __str__(self):
+            return f"{self.nazwa} – {self.uzytkownik.username}"
+
+
+
