@@ -53,6 +53,14 @@ class Leki(models.Model):
 
         def __str__(self):
             return f"{self.nazwa} – {self.uzytkownik.username}"
+        
+class Wizyty(models.Model):
+        uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+        imie_nazwisko_lekarza = models.CharField(max_length=100)
+        specjalizacja = models.CharField(max_length=100)
+        data_wizyty = models.DateTimeField()
+        notatki = models.TextField(blank=True)
 
-
+        def __str__(self):
+            return f"Wizyta u {self.imie_nazwisko_lekarza} – {self.uzytkownik.username}"   
 
