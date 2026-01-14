@@ -37,4 +37,12 @@ class Pomiary(models.Model):
         def __str__(self):
             return f"Pomiar zdrowia – {self.uzytkownik.username} ({self.data.date()})"
 
-   
+class Aktywnosc(models.Model):
+        uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+        rodzaj_aktywnosci = models.CharField(max_length=50)
+        czas_trwania_minuty = models.PositiveIntegerField()
+        data = models.DateField()
+
+        def __str__(self):
+            return f"{self.rodzaj_aktywnosci} – {self.uzytkownik.username}"
+
