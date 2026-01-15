@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 # Create your models here.
@@ -59,9 +60,15 @@ class Aktywnosc(models.Model):
             verbose_name = "Aktywność"
             verbose_name_plural = "Aktywności"
 
+        def clean(self):
+            if self.czas_trwania_minuty is not None and self.czas_trwania_minuty <= 15:
+             raise ValidationError({
+                "czas_trwania_minuty": "Czas trwania musi być większy niż 15 minut."
+            })
+
         def __str__(self):
                 return f"{self.get_rodzaj_aktywnosci_display()} - {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
-
+    
 class Leki(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         nazwa = models.CharField(max_length = 100)
