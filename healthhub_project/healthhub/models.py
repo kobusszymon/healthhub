@@ -8,6 +8,13 @@ class Plec(models.IntegerChoices):
         KOBIETA = 2, "Kobieta"
         INNA = 3, "Inna"
 
+class RodzajAktywnosci(models.TextChoices):
+        BIEGANIE = "bieganie", "Bieganie"
+        JAZDA_ROWEREM = "jazda_rowerem", "Jazda rowerem"
+        PLYWANIE = "plywanie", "Pływanie"
+        SILOWNIA = "silownia", "Siłownia"
+        INNA = "inna", "Inna"
+
 class ProfilUzytkownika(models.Model):
         uzytkownik = models.OneToOneField(User, on_delete=models.CASCADE)
         plec = models.IntegerField(choices = Plec.choices, default = 3)
@@ -17,7 +24,8 @@ class ProfilUzytkownika(models.Model):
         waga_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
         def __str__(self):
-            return f"Profil użytkownika: {self.uzytkownik.username}"
+                return f"{self.uzytkownik.first_name} {self.uzytkownik.last_name}"
+
 
 class Pomiary(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -28,16 +36,16 @@ class Pomiary(models.Model):
         pomiar_cukru = models.DecimalField(max_digits = 5, decimal_places = 2, null = True, blank = True)
 
         def __str__(self):
-            return f"Pomiar zdrowia – {self.uzytkownik.username} ({self.data.date()})"
+                return f"Pomiar zdrowia – {self.uzytkownik.first_name} {self.uzytkownik.last_name} ({self.data.date()})"
 
 class Aktywnosc(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
-        rodzaj_aktywnosci = models.CharField(max_length = 50)
+        rodzaj_aktywnosci = models.CharField(max_length =50, choices=RodzajAktywnosci.choices)
         czas_trwania_minuty = models.PositiveIntegerField()
         data = models.DateField()
 
         def __str__(self):
-            return f"{self.rodzaj_aktywnosci} – {self.uzytkownik.username}"
+                return f"{self.get_rodzaj_aktywnosci_display()} - {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
 
 class Leki(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -45,7 +53,7 @@ class Leki(models.Model):
         dawka = models.CharField(max_length = 100)
 
         def __str__(self):
-            return f"{self.nazwa} – {self.uzytkownik.username}"
+                return f"{self.nazwa} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
         
 class Wizyty(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -56,5 +64,5 @@ class Wizyty(models.Model):
         notatki = models.TextField(blank = True)
 
         def __str__(self):
-            return f"Wizyta u {self.imie_nazwisko_lekarza} – {self.uzytkownik.username}"   
+                return f"Wizyta u {self.imie_nazwisko_lekarza} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"   
 
