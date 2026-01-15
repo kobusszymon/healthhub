@@ -79,6 +79,14 @@ class Wizyty(models.Model):
         lokalizacja = models.CharField(max_length = 200)
         notatki = models.TextField(blank = True)
 
+        class Meta:
+            ordering = ["-data_wizyty"]
+            indexes = [
+            models.Index(fields=["uzytkownik", "data_wizyty"]),
+            ]
+            verbose_name = "Wizyta"
+            verbose_name_plural = "Wizyty"
+    
         def __str__(self):
                 return f"Wizyta u {self.imie_nazwisko_lekarza} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"   
 
