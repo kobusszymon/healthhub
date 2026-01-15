@@ -20,19 +20,19 @@ class ProfilUzytkownika(models.Model):
             return f"Profil użytkownika: {self.uzytkownik.username}"
 
 class Pomiary(models.Model):
-        uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
-        data = models.DateTimeField(auto_now_add=True)
-        cisnienie_skurczowe = models.PositiveIntegerField(null=True, blank=True)
-        cisnienie_rozkurczowe = models.PositiveIntegerField(null=True, blank=True)
-        tetno = models.PositiveIntegerField(null=True, blank=True)
-        pomiar_cukru = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+        uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
+        data = models.DateTimeField(auto_now_add = True)
+        cisnienie_skurczowe = models.PositiveIntegerField(null = True, blank = True)
+        cisnienie_rozkurczowe = models.PositiveIntegerField(null = True, blank = True)
+        tetno = models.PositiveIntegerField(null = True, blank = True)
+        pomiar_cukru = models.DecimalField(max_digits = 5, decimal_places = 2, null = True, blank = True)
 
         def __str__(self):
             return f"Pomiar zdrowia – {self.uzytkownik.username} ({self.data.date()})"
 
 class Aktywnosc(models.Model):
-        uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
-        rodzaj_aktywnosci = models.CharField(max_length=50)
+        uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
+        rodzaj_aktywnosci = models.CharField(max_length = 50)
         czas_trwania_minuty = models.PositiveIntegerField()
         data = models.DateField()
 
@@ -40,19 +40,20 @@ class Aktywnosc(models.Model):
             return f"{self.rodzaj_aktywnosci} – {self.uzytkownik.username}"
 
 class Leki(models.Model):
-        uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
-        nazwa = models.CharField(max_length=100)
-        dawka = models.CharField(max_length=100)
+        uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
+        nazwa = models.CharField(max_length = 100)
+        dawka = models.CharField(max_length = 100)
 
         def __str__(self):
             return f"{self.nazwa} – {self.uzytkownik.username}"
         
 class Wizyty(models.Model):
-        uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
-        imie_nazwisko_lekarza = models.CharField(max_length=100)
-        specjalizacja = models.CharField(max_length=100)
+        uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
+        imie_nazwisko_lekarza = models.CharField(max_length = 100)
+        specjalizacja = models.CharField(max_length = 100)
         data_wizyty = models.DateTimeField()
-        notatki = models.TextField(blank=True)
+        lokalizacja = models.CharField(max_length = 200)
+        notatki = models.TextField(blank = True)
 
         def __str__(self):
             return f"Wizyta u {self.imie_nazwisko_lekarza} – {self.uzytkownik.username}"   
