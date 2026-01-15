@@ -52,6 +52,14 @@ class Aktywnosc(models.Model):
         czas_trwania_minuty = models.PositiveIntegerField()
         data = models.DateField()
 
+        class Meta:
+            ordering = ["-data"]
+            indexes = [
+            models.Index(fields=["uzytkownik", "data"]),
+            ]
+            verbose_name = "Aktywność"
+            verbose_name_plural = "Aktywności"
+
         def __str__(self):
                 return f"{self.get_rodzaj_aktywnosci_display()} - {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
 
