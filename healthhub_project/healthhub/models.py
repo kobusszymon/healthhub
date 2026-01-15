@@ -13,7 +13,7 @@ class Uzytkownik(models.Model):
         nazwisko = models.CharField(max_length = 100)
         plec = models.IntegerField(choices = Plec.choices, default = 3)
         telefon = models.CharField(max_length = 9, blank = True)
-        email = models.EmailField
+        email = models.EmailField()
         data_utworzenia = models.DateTimeField (auto_now_add = True, editable = False)
 
 class ProfilUzytkownika(models.Model):
@@ -24,7 +24,6 @@ class ProfilUzytkownika(models.Model):
 
         def __str__(self):
             return f"Profil użytkownika: {self.uzytkownik.username}"
-
 
 class Pomiary(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
