@@ -35,6 +35,14 @@ class Pomiary(models.Model):
         tetno = models.PositiveIntegerField(null = True, blank = True)
         pomiar_cukru = models.DecimalField(max_digits = 5, decimal_places = 2, null = True, blank = True)
 
+        class Meta:
+            ordering = ["-data"]
+            indexes = [
+            models.Index(fields=["uzytkownik", "data"]),
+            ]
+            verbose_name = "Pomiar"
+            verbose_name_plural = "Pomiary"
+
         def __str__(self):
                 return f"Pomiar zdrowia – {self.uzytkownik.first_name} {self.uzytkownik.last_name} ({self.data.date()})"
 
