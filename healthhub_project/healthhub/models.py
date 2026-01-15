@@ -26,7 +26,6 @@ class ProfilUzytkownika(models.Model):
         def __str__(self):
                 return f"{self.uzytkownik.first_name} {self.uzytkownik.last_name}"
 
-
 class Pomiary(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         data = models.DateTimeField(auto_now_add = True)
@@ -67,6 +66,11 @@ class Leki(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         nazwa = models.CharField(max_length = 100)
         dawka = models.CharField(max_length = 100)
+
+        class Meta:
+            ordering = ["nazwa"]
+            verbose_name = "Lek"
+            verbose_name_plural = "Leki"
 
         def __str__(self):
                 return f"{self.nazwa} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
