@@ -8,16 +8,10 @@ class Plec(models.IntegerChoices):
         KOBIETA = 2, "Kobieta"
         INNA = 3, "Inna"
 
-class Uzytkownik(models.Model):
-        imie = models.CharField(max_length = 50)
-        nazwisko = models.CharField(max_length = 100)
-        plec = models.IntegerField(choices = Plec.choices, default = 3)
-        telefon = models.CharField(max_length = 9, blank = True)
-        email = models.EmailField()
-        data_utworzenia = models.DateTimeField (auto_now_add = True, editable = False)
-
 class ProfilUzytkownika(models.Model):
         uzytkownik = models.OneToOneField(User, on_delete=models.CASCADE)
+        plec = models.IntegerField(choices = Plec.choices, default = 3)
+        telefon = models.CharField(max_length = 9, blank = True)
         data_urodzenia = models.DateField(null=True, blank=True)
         wzrost_cm = models.PositiveIntegerField(null=True, blank=True)
         waga_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
