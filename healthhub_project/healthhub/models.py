@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 # Create your models here.
@@ -26,7 +27,6 @@ class ProfilUzytkownika(models.Model):
         def __str__(self):
                 return f"{self.uzytkownik.first_name} {self.uzytkownik.last_name}"
 
-
 class Pomiary(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         data = models.DateTimeField(auto_now_add = True)
@@ -34,6 +34,14 @@ class Pomiary(models.Model):
         cisnienie_rozkurczowe = models.PositiveIntegerField(null = True, blank = True)
         tetno = models.PositiveIntegerField(null = True, blank = True)
         pomiar_cukru = models.DecimalField(max_digits = 5, decimal_places = 2, null = True, blank = True)
+
+        class Meta:
+            ordering = ["-data"]
+            indexes = [
+            models.Index(fields=["uzytkownik", "data"]),
+            ]
+            verbose_name = "Pomiar"
+            verbose_name_plural = "Pomiary"
 
         def __str__(self):
                 return f"Pomiar zdrowia – {self.uzytkownik.first_name} {self.uzytkownik.last_name} ({self.data.date()})"
@@ -44,13 +52,32 @@ class Aktywnosc(models.Model):
         czas_trwania_minuty = models.PositiveIntegerField()
         data = models.DateField()
 
+        class Meta:
+            ordering = ["-data"]
+            indexes = [
+            models.Index(fields=["uzytkownik", "data"]),
+            ]
+            verbose_name = "Aktywność"
+            verbose_name_plural = "Aktywności"
+
+        def clean(self):
+            if self.czas_trwania_minuty is not None and self.czas_trwania_minuty <= 15:
+             raise ValidationError({
+                "czas_trwania_minuty": "Czas trwania musi być większy niż 15 minut."
+            })
+
         def __str__(self):
                 return f"{self.get_rodzaj_aktywnosci_display()} - {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
-
+    
 class Leki(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         nazwa = models.CharField(max_length = 100)
         dawka = models.CharField(max_length = 100)
+
+        class Meta:
+            ordering = ["nazwa"]
+            verbose_name = "Lek"
+            verbose_name_plural = "Leki"
 
         def __str__(self):
                 return f"{self.nazwa} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
@@ -63,6 +90,14 @@ class Wizyty(models.Model):
         lokalizacja = models.CharField(max_length = 200)
         notatki = models.TextField(blank = True)
 
+        class Meta:
+            ordering = ["-data_wizyty"]
+            indexes = [
+            models.Index(fields=["uzytkownik", "data_wizyty"]),
+            ]
+            verbose_name = "Wizyta"
+            verbose_name_plural = "Wizyty"
+    
         def __str__(self):
                 return f"Wizyta u {self.imie_nazwisko_lekarza} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"   
 
