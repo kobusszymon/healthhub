@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django.db.models import Avg
+from django.db.models import Avg, Sum
 
 class PomiarQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
@@ -33,7 +33,7 @@ class PomiarQuerySet(models.QuerySet):
     def srednie_tetno(self):
         return self.aggregate(
             avg_tetno=Avg("tetno")
-    )
+        )
     
 class AktywnoscQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
@@ -44,6 +44,23 @@ class AktywnoscQuerySet(models.QuerySet):
 
     def w_zakresie_dat(self, od, do):
         return self.filter(data__range=(od, do))
+    
+    def sredni_czas(self):
+        return self.aggregate(
+            avg_czas=Avg("czas_trwania_minuty")
+        )
+
+    def sredni_czas_typu(self, rodzaj):
+        return self.filter(
+            rodzaj_aktywnosci=rodzaj
+        ).aggregate(
+            avg_czas=Avg("czas_trwania_minuty")
+        )
+
+    def laczny_czas(self):
+        return self.aggregate(
+            suma_minut=Sum("czas_trwania_minuty")
+        )
     
 class LekQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
