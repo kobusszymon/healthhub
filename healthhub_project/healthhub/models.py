@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-
-# Create your models here.
 class Plec(models.IntegerChoices):
         MEZCZYZNA = 1, "Mężczyzna"
         KOBIETA = 2, "Kobieta"
@@ -25,9 +23,9 @@ class ProfilUzytkownika(models.Model):
         waga_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
         def __str__(self):
-                return f"{self.uzytkownik.first_name} {self.uzytkownik.last_name}"
+              return f"{self.uzytkownik.first_name} {self.uzytkownik.last_name}"
 
-class Pomiary(models.Model):
+class Pomiar(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         data = models.DateTimeField(auto_now_add = True)
         cisnienie_skurczowe = models.PositiveIntegerField(null = True, blank = True)
@@ -36,15 +34,15 @@ class Pomiary(models.Model):
         pomiar_cukru = models.DecimalField(max_digits = 5, decimal_places = 2, null = True, blank = True)
 
         class Meta:
-            ordering = ["-data"]
-            indexes = [
-            models.Index(fields=["uzytkownik", "data"]),
-            ]
-            verbose_name = "Pomiar"
-            verbose_name_plural = "Pomiary"
+              ordering = ["-data"]
+              indexes = [
+                    models.Index(fields=["uzytkownik", "data"]),
+                ]
+              verbose_name = "Pomiar"
+              verbose_name_plural = "Pomiary"
 
         def __str__(self):
-                return f"Pomiar zdrowia – {self.uzytkownik.first_name} {self.uzytkownik.last_name} ({self.data.date()})"
+              return f"Pomiar {self.uzytkownik.first_name} {self.uzytkownik.last_name} ({self.data.date()})"
 
 class Aktywnosc(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -53,51 +51,69 @@ class Aktywnosc(models.Model):
         data = models.DateField()
 
         class Meta:
-            ordering = ["-data"]
-            indexes = [
-            models.Index(fields=["uzytkownik", "data"]),
-            ]
-            verbose_name = "Aktywność"
-            verbose_name_plural = "Aktywności"
+              ordering = ["-data"]
+              indexes = [
+                    models.Index(fields=["uzytkownik", "data"]),
+                ]
+              verbose_name = "Aktywność"
+              verbose_name_plural = "Aktywności"
 
         def clean(self):
-            if self.czas_trwania_minuty is not None and self.czas_trwania_minuty <= 15:
-             raise ValidationError({
-                "czas_trwania_minuty": "Czas trwania musi być większy niż 15 minut."
-            })
+              if self.czas_trwania_minuty is not None and self.czas_trwania_minuty <= 15:
+                    raise ValidationError({
+                          "czas_trwania_minuty": "Czas trwania musi być większy niż 15 minut."
+                          })
 
         def __str__(self):
-                return f"{self.get_rodzaj_aktywnosci_display()} - {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
+              return f"{self.get_rodzaj_aktywnosci_display()} - {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
     
-class Leki(models.Model):
+class Lek(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         nazwa = models.CharField(max_length = 100)
         dawka = models.CharField(max_length = 100)
 
         class Meta:
-            ordering = ["nazwa"]
-            verbose_name = "Lek"
-            verbose_name_plural = "Leki"
+              ordering = ["nazwa"]
+              verbose_name = "Lek"
+              verbose_name_plural = "Leki"
 
         def __str__(self):
-                return f"{self.nazwa} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
-        
-class Wizyty(models.Model):
-        uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
-        imie_nazwisko_lekarza = models.CharField(max_length = 100)
-        specjalizacja = models.CharField(max_length = 100)
-        data_wizyty = models.DateTimeField()
-        lokalizacja = models.CharField(max_length = 200)
-        notatki = models.TextField(blank = True)
+              return f"{self.nazwa} - {self.uzytkownik.first_name} {self.uzytkownik.last_name}"
 
-        class Meta:
-            ordering = ["-data_wizyty"]
-            indexes = [
-            models.Index(fields=["uzytkownik", "data_wizyty"]),
-            ]
-            verbose_name = "Wizyta"
-            verbose_name_plural = "Wizyty"
+class Lokalizacja(models.Model):
+      nazwa = models.CharField(max_length = 150)
+      adres = models.CharField(max_length = 200)
+      miasto = models.CharField(max_length = 100)
+      
+      class Meta:
+        ordering = ["nazwa", "miasto"]
+
+      def __str__(self):
+        return f"{self.nazwa} | {self.adres}, {self.miasto}"
+
+class TerminWizyty(models.Model):
+      imie_nazwisko_lekarza = models.CharField(max_length=100)
+      specjalizacja = models.CharField(max_length=100)
+      data_wizyty = models.DateTimeField()
+      lokalizacja = models.ForeignKey(Lokalizacja, on_delete = models.PROTECT)
+      uzytkownik = models.ForeignKey(User, null = True, blank = True, on_delete = models.SET_NULL)
+      
+      class Meta:
+        ordering = ["data_wizyty"]
+        indexes = [
+              models.Index(fields = ["uzytkownik", "data_wizyty"]),
+              models.Index(fields = ["data_wizyty"]),
+        ]
+        verbose_name = "Termin wizyty"
+        verbose_name_plural = "Terminy wizyt"
+        constraints = [
+              models.UniqueConstraint(
+                    fields=["imie_nazwisko_lekarza", "data_wizyty", "lokalizacja"],
+                    name="unique_termin",
+                    )
+                ]
     
         def __str__(self):
-                return f"Wizyta u {self.imie_nazwisko_lekarza} – {self.uzytkownik.first_name} {self.uzytkownik.last_name}"   
-
+              if self.uzytkownik:
+                    return (f"Termin wizyty u {self.imie_nazwisko_lekarza}: {self.uzytkownik.first_name} {self.uzytkownik.last_name}")
+              return f"Termin wizyty u {self.imie_nazwisko_lekarza}: wolny"
