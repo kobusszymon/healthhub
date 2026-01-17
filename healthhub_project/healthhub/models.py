@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db.models import Avg, Sum
+from django.db.models import Min, Max
 
 class PomiarQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
@@ -33,6 +34,26 @@ class PomiarQuerySet(models.QuerySet):
     def srednie_tetno(self):
         return self.aggregate(
             avg_tetno=Avg("tetno")
+        )
+    
+    def zakres_tetna(self):
+        return self.aggregate(
+            min_tetno=Min("tetno"),
+            max_tetno=Max("tetno")
+        )
+    
+    def zakres_cukru(self):
+        return self.aggregate(
+            min_cukier=Min("pomiar_cukru"),
+            max_cukier=Max("pomiar_cukru")
+        )
+    
+    def zakres_cisnienia(self):
+        return self.aggregate(
+            skurcz_min=Min("cisnienie_skurczowe"),
+            skurcz_max=Max("cisnienie_skurczowe"),
+            rozkurcz_min=Min("cisnienie_rozkurczowe"),
+            rozkurcz_max=Max("cisnienie_rozkurczowe"),
         )
     
 class AktywnoscQuerySet(models.QuerySet):
