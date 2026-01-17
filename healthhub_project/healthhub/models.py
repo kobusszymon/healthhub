@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db.models import Avg
 
 class PomiarQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
@@ -17,6 +18,22 @@ class PomiarQuerySet(models.QuerySet):
         return self.filter(
             data__gte=timezone.now() - timezone.timedelta(days=dni)
         )
+    
+    def srednie_cisnienie(self):
+        return self.aggregate(
+            avg_skurczowe=Avg("cisnienie_skurczowe"),
+            avg_rozkurczowe=Avg("cisnienie_rozkurczowe"),
+        )
+    
+    def sredni_cukier(self):
+        return self.aggregate(
+            avg_cukier=Avg("pomiar_cukru")
+        )
+
+    def srednie_tetno(self):
+        return self.aggregate(
+            avg_tetno=Avg("tetno")
+    )
     
 class AktywnoscQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
