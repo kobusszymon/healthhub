@@ -22,6 +22,10 @@ class ProfilUzytkownika(models.Model):
         wzrost_cm = models.PositiveIntegerField(null=True, blank=True)
         waga_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
+        class Meta:
+              verbose_name = "Profil użytkownika"
+              verbose_name_plural = "Profile użytkowników"
+
         def __str__(self):
               return f"{self.uzytkownik.first_name} {self.uzytkownik.last_name}"
 
@@ -87,6 +91,8 @@ class Lokalizacja(models.Model):
       
       class Meta:
         ordering = ["nazwa", "miasto"]
+        verbose_name = "Lokalizacja"
+        verbose_name_plural = "Lokalizacje"
 
       def __str__(self):
         return f"{self.nazwa} | {self.adres}, {self.miasto}"
