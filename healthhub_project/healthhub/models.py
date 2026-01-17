@@ -28,6 +28,13 @@ class AktywnoscQuerySet(models.QuerySet):
     def w_zakresie_dat(self, od, do):
         return self.filter(data__range=(od, do))
     
+class LekQuerySet(models.QuerySet):
+    def dla_uzytkownika(self, user):
+        return self.filter(uzytkownik=user)
+
+    def szukaj(self, fraza):
+        return self.filter(nazwa__icontains=fraza)   
+    
 class Plec(models.IntegerChoices):
         MEZCZYZNA = 1, "Mężczyzna"
         KOBIETA = 2, "Kobieta"
@@ -105,6 +112,8 @@ class Lek(models.Model):
         uzytkownik = models.ForeignKey(User, on_delete = models.CASCADE)
         nazwa = models.CharField(max_length = 100)
         dawka = models.CharField(max_length = 100)
+
+        objects = LekQuerySet.as_manager()  
 
         class Meta:
               ordering = ["nazwa"]
