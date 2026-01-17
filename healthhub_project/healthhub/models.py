@@ -18,6 +18,16 @@ class PomiarQuerySet(models.QuerySet):
             data__gte=timezone.now() - timezone.timedelta(days=dni)
         )
     
+class AktywnoscQuerySet(models.QuerySet):
+    def dla_uzytkownika(self, user):
+        return self.filter(uzytkownik=user)
+
+    def typu(self, rodzaj):
+        return self.filter(rodzaj_aktywnosci=rodzaj)
+
+    def w_zakresie_dat(self, od, do):
+        return self.filter(data__range=(od, do))
+    
 class Plec(models.IntegerChoices):
         MEZCZYZNA = 1, "Mężczyzna"
         KOBIETA = 2, "Kobieta"
@@ -71,6 +81,8 @@ class Aktywnosc(models.Model):
         rodzaj_aktywnosci = models.CharField(max_length =50, choices=RodzajAktywnosci.choices)
         czas_trwania_minuty = models.PositiveIntegerField()
         data = models.DateField()
+
+        objects = AktywnoscQuerySet.as_manager() 
 
         class Meta:
               ordering = ["-data"]
