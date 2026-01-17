@@ -1,7 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
+class PomiarQuerySet(models.QuerySet):
+    def dla_uzytkownika(self, user):
+        return self.filter(uzytkownik=user)
+
+    def z_dnia(self, dzien):
+        return self.filter(data__date=dzien)
+
+    def w_zakresie_dat(self, od, do):
+        return self.filter(data__range=(od, do))
+
+    def z_ostatnich_dni(self, dni):
+        return self.filter(
+            data__gte=timezone.now() - timezone.timedelta(days=dni)
+        )
+    
 class Plec(models.IntegerChoices):
         MEZCZYZNA = 1, "Mężczyzna"
         KOBIETA = 2, "Kobieta"
@@ -36,6 +52,8 @@ class Pomiar(models.Model):
         cisnienie_rozkurczowe = models.PositiveIntegerField(null = True, blank = True)
         tetno = models.PositiveIntegerField(null = True, blank = True)
         pomiar_cukru = models.DecimalField(max_digits = 5, decimal_places = 2, null = True, blank = True)
+
+        objects = PomiarQuerySet.as_manager()
 
         class Meta:
               ordering = ["-data"]
