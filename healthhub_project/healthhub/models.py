@@ -64,8 +64,8 @@ class PomiarQuerySet(models.QuerySet):
 
     def wysokie_cisnienie(self):
         return self.filter(
-            models.Q(cisnienie_skurczowe__gte=140) | 
-            models.Q(cisnienie_rozkurczowe__gte=90)
+            Q(cisnienie_skurczowe__gte=140) | 
+            Q(cisnienie_rozkurczowe__gte=90)
         )
 
     def w_normie(self):
@@ -132,9 +132,9 @@ class LokalizacjaQuerySet(models.QuerySet):
 
     def szukaj(self, fraza):
         return self.filter(
-            models.Q(nazwa__icontains=fraza) |
-            models.Q(adres__icontains=fraza) |
-            models.Q(miasto__icontains=fraza)
+            Q(nazwa__icontains=fraza) |
+            Q(adres__icontains=fraza) |
+            Q(miasto__icontains=fraza)
         )  
 
 
