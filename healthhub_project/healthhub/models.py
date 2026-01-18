@@ -19,6 +19,11 @@ class PomiarQuerySet(models.QuerySet):
         return self.filter(
             data__gte=timezone.now() - timezone.timedelta(days=dni)
         )
+    def liczba(self):
+        return self.count()
+
+    def ostatni(self):
+        return self.first()
     
     def srednie_cisnienie(self):
         return self.aggregate(
