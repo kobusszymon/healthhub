@@ -27,18 +27,21 @@ class PomiarQuerySet(models.QuerySet):
         return self.order_by("-data").first()
     
     def srednie_cisnienie(self):
-        return self.aggregate(
+        return self.filter(
+            cisnienie_skurczowe__isnull=False,
+            cisnienie_rozkurczowe__isnull=False,
+        ).aggregate(
             avg_skurczowe=Avg("cisnienie_skurczowe"),
             avg_rozkurczowe=Avg("cisnienie_rozkurczowe"),
         )
     
     def sredni_cukier(self):
-        return self.aggregate(
+        return self.filter(pomiar_cukru__isnull=False).aggregate(
             avg_cukier=Avg("pomiar_cukru")
         )
 
     def srednie_tetno(self):
-        return self.aggregate(
+        return self.filter(tetno__isnull=False).aggregate(
             avg_tetno=Avg("tetno")
         )
     
