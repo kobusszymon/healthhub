@@ -116,7 +116,25 @@ class LekQuerySet(models.QuerySet):
         return self.filter(uzytkownik=user)
 
     def szukaj(self, fraza):
-        return self.filter(nazwa__icontains=fraza)   
+        return self.filter(nazwa__icontains=fraza)  
+
+
+class LokalizacjaQuerySet(models.QuerySet):
+    def po_nazwie(self, fraza):
+        return self.filter(nazwa__icontains=fraza)
+
+    def po_adresie(self, fraza):
+        return self.filter(adres__icontains=fraza)
+
+    def w_miescie(self, miasto):
+        return self.filter(miasto__iexact=miasto)
+
+    def szukaj(self, fraza):
+        return self.filter(
+            models.Q(nazwa__icontains=fraza) |
+            models.Q(adres__icontains=fraza) |
+            models.Q(miasto__icontains=fraza)
+        )     
     
 
 class Plec(models.IntegerChoices):
@@ -217,6 +235,8 @@ class Lokalizacja(models.Model):
     nazwa = models.CharField(max_length = 150)
     adres = models.CharField(max_length = 200)
     miasto = models.CharField(max_length = 100)
+
+    objects = LokalizacjaQuerySet.as_manager()
       
     class Meta:
         ordering = ["nazwa", "miasto"]
