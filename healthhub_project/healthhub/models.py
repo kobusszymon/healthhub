@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db.models import Q
 from django.db.models import Avg, Sum
 from django.db.models import Min, Max
 
@@ -134,7 +135,44 @@ class LokalizacjaQuerySet(models.QuerySet):
             models.Q(nazwa__icontains=fraza) |
             models.Q(adres__icontains=fraza) |
             models.Q(miasto__icontains=fraza)
-        )     
+        )  
+
+
+class TerminWizytyQuerySet(models.QuerySet):
+
+    def dla_uzytkownika(self, user):
+        return self.filter(uzytkownik=user)
+
+    def wolne(self):
+        return self.filter(uzytkownik__isnull=True)
+
+    def po_lekarzu(self, fraza):
+        return self.filter(imie_nazwisko_lekarza__icontains=fraza)
+
+    def po_specjalizacji(self, fraza):
+        return self.filter(specjalizacja__icontains=fraza)
+
+    def w_dniu(self, dzien):
+        return self.filter(data_wizyty__date=dzien)
+
+    def w_zakresie_dat(self, od, do):
+        return self.filter(data_wizyty__range=(od, do))
+
+    def przyszle(self):
+        return self.filter(data_wizyty__gte=timezone.now())
+
+    def przeszle(self):
+        return self.filter(data_wizyty__lt=timezone.now())
+
+    def szukaj(self, fraza):
+        if not fraza:
+            return self
+        return self.filter(
+            Q(imie_nazwisko_lekarza__icontains=fraza) |
+            Q(specjalizacja__icontains=fraza) |
+            Q(lokalizacja__nazwa__icontains=fraza) |
+            Q(lokalizacja__miasto__icontains=fraza)
+        )      
     
 
 class Plec(models.IntegerChoices):
@@ -253,6 +291,8 @@ class TerminWizyty(models.Model):
     data_wizyty = models.DateTimeField()
     lokalizacja = models.ForeignKey(Lokalizacja, on_delete = models.PROTECT)
     uzytkownik = models.ForeignKey(User, null = True, blank = True, on_delete = models.SET_NULL)
+
+    objects = TerminWizytyQuerySet.as_manager()
       
     class Meta:
         ordering = ["data_wizyty"]
