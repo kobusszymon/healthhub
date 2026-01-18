@@ -60,6 +60,18 @@ class PomiarQuerySet(models.QuerySet):
             rozkurcz_min=Min("cisnienie_rozkurczowe"),
             rozkurcz_max=Max("cisnienie_rozkurczowe"),
         )
+
+    def wysokie_cisnienie(self):
+        return self.filter(
+            models.Q(cisnienie_skurczowe__gte=140) | 
+            models.Q(cisnienie_rozkurczowe__gte=90)
+        )
+
+    def w_normie(self):
+        return self.filter(
+            cisnienie_skurczowe__lt=130,
+            cisnienie_rozkurczowe__lt=85
+        ) 
     
 class AktywnoscQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
