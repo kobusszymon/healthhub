@@ -71,6 +71,12 @@ class AktywnoscQuerySet(models.QuerySet):
     def w_zakresie_dat(self, od, do):
         return self.filter(data__range=(od, do))
     
+    def liczba(self):
+        return self.count()
+
+    def ostatnia(self):
+        return self.first()
+    
     def sredni_czas(self):
         return self.aggregate(
             avg_czas=Avg("czas_trwania_minuty")
