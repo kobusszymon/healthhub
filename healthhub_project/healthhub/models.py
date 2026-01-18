@@ -73,6 +73,9 @@ class PomiarQuerySet(models.QuerySet):
             cisnienie_rozkurczowe__lt=85
         ) 
     
+    def wysokie_tetno(self, prog=100):
+        return self.filter(tetno__gte=prog)
+    
 class AktywnoscQuerySet(models.QuerySet):
     def dla_uzytkownika(self, user):
         return self.filter(uzytkownik=user)
