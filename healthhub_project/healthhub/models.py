@@ -24,7 +24,7 @@ class PomiarQuerySet(models.QuerySet):
         return self.count()
 
     def ostatni(self):
-        return self.first()
+        return self.order_by("-data").first()
     
     def srednie_cisnienie(self):
         return self.aggregate(
@@ -91,8 +91,8 @@ class AktywnoscQuerySet(models.QuerySet):
     def liczba(self):
         return self.count()
 
-    def ostatnia(self):
-        return self.first()
+    def ostatni(self):
+        return self.order_by("-data").first()
     
     def sredni_czas(self):
         return self.aggregate(
