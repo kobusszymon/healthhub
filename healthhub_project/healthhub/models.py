@@ -226,6 +226,15 @@ class Pomiar(models.Model):
         verbose_name = "Pomiar"
         verbose_name_plural = "Pomiary"
 
+    def clean(self):
+        if (
+            (self.cisnienie_skurczowe is not None and self.cisnienie_rozkurczowe is None) or
+            (self.cisnienie_skurczowe is None and self.cisnienie_rozkurczowe is not None)
+        ):
+            raise ValidationError(
+                "Ciśnienie skurczowe i rozkurczowe muszą być podane razem."
+            )   
+
     def __str__(self):
         return f"Pomiar {self.uzytkownik.first_name} {self.uzytkownik.last_name} ({self.data.date()})"
 
