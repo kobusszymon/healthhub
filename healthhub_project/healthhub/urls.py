@@ -10,4 +10,6 @@ urlpatterns = [
     path('lek/<int:pk>/', views.lek_detail, name = 'lek-detail'),
     path('aktywnosc/', views.aktywnosc_list, name ='aktywnosc-list'),
     path('aktywnosc/<int:pk>/', views.aktywnosc_detail, name = 'aktywnosc-detail'),
+    path('lokalizacja/', views.lokalizacja_list, name ='lokalizacja-list'),
+    path('lokalizacja/<int:pk>/', views.lokalizacja_detail, name = 'lokalizacja-detail'),
 ]
