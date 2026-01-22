@@ -6,4 +6,6 @@ urlpatterns = [
     path('profile/<int:pk>/', views.profil_detail, name = 'profil-detail'),
     path('pomiar/', views.pomiar_list, name ='pomiar-list'),
     path('pomiar/<int:pk>/', views.pomiar_detail, name = 'pomiar-detail'),
+    path('lek/', views.lek_list, name ='lek-list'),
+    path('lek/<int:pk>/', views.lek_detail, name = 'lek-detail'),
 ]
