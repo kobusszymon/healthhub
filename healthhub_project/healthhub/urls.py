@@ -8,4 +8,6 @@ urlpatterns = [
     path('pomiar/<int:pk>/', views.pomiar_detail, name = 'pomiar-detail'),
     path('lek/', views.lek_list, name ='lek-list'),
     path('lek/<int:pk>/', views.lek_detail, name = 'lek-detail'),
+    path('aktywnosc/', views.aktywnosc_list, name ='aktywnosc-list'),
+    path('aktywnosc/<int:pk>/', views.aktywnosc_detail, name = 'aktywnosc-detail'),
 ]
