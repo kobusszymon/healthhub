@@ -54,6 +54,35 @@ def pomiar_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["GET", "POST"])
+def pomiar_list(request):
+    qs = Pomiar.objects.dla_uzytkownika(request.user)
+
+    if request.method == "GET":
+        dni = request.query_params.get("dni")
+        if dni:
+            qs = qs.z_ostatnich_dni(int(dni))
+
+        return Response({
+            "count": qs.liczba(),
+            "ostatni": PomiarSerializer(qs.ostatni()).data if qs.ostatni() else None,
+            "srednie_cisnienie": qs.srednie_cisnienie(),
+            "srednie_tetno": qs.srednie_tetno(),
+            "sredni_cukier": qs.sredni_cukier(),
+            "zakres_cisnienia": qs.zakres_cisnienia(),
+            "zakres_tetna": qs.zakres_tetna(),
+            "zakres_cukru": qs.zakres_cukru(),
+            "wyniki": PomiarSerializer(qs, many=True).data,
+        })
+
+    elif request.method == "POST":
+        serializer = PomiarSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(uzytkownik=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+   
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def pomiar_detail(request, pk):
@@ -76,6 +105,28 @@ def pomiar_detail(request, pk):
     elif request.method == 'DELETE':
         pomiar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(["GET", "PUT", "DELETE"])
+def pomiar_detail(request, pk):
+    try:
+        pomiar = Pomiar.objects.dla_uzytkownika(request.user).get(pk=pk)
+    except Pomiar.DoesNotExist:
+        return Response(status=404)
+
+    if request.method == "GET":
+        return Response(PomiarSerializer(pomiar).data)
+
+    elif request.method == "PUT":
+        serializer = PomiarSerializer(pomiar, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    elif request.method == "DELETE":
+        pomiar.delete()
+        return Response(status=204)
+   
 
 @api_view(['GET', 'POST'])
 def lek_list(request):
@@ -90,6 +141,25 @@ def lek_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["GET", "POST"])
+def lek_list(request):
+    qs = Lek.objects.dla_uzytkownika(request.user)
+
+    if request.method == "GET":
+        fraza = request.query_params.get("q")
+        if fraza:
+            qs = qs.szukaj(fraza)
+
+        return Response(LekSerializer(qs, many=True).data)
+
+    elif request.method == "POST":
+        serializer = LekSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(uzytkownik=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+   
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def lek_detail(request, pk):
@@ -126,6 +196,31 @@ def aktywnosc_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["GET", "POST"])
+def aktywnosc_list(request):
+    qs = Aktywnosc.objects.dla_uzytkownika(request.user)
+
+    if request.method == "GET":
+        rodzaj = request.query_params.get("rodzaj")
+        if rodzaj:
+            qs = qs.typu(rodzaj)
+
+        return Response({
+            "count": qs.liczba(),
+            "ostatni": AktywnoscSerializer(qs.ostatni()).data if qs.ostatni() else None,
+            "sredni_czas": qs.sredni_czas(),
+            "laczny_czas": qs.laczny_czas(),
+            "wyniki": AktywnoscSerializer(qs, many=True).data,
+        })
+
+    elif request.method == "POST":
+        serializer = AktywnoscSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(uzytkownik=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+   
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def aktywnosc_detail(request, pk):
@@ -162,6 +257,17 @@ def lokalizacja_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["GET"])
+def lokalizacja_list(request):
+    qs = Lokalizacja.objects.all()
+
+    fraza = request.query_params.get("q")
+    if fraza:
+        qs = qs.szukaj(fraza)
+
+    return Response(LokalizacjaSerializer(qs, many=True).data)
+   
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def lokalizacja_detail(request, pk):
@@ -198,6 +304,17 @@ def termin_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["GET"])
+def termin_list(request):
+    qs = TerminWizyty.objects.przyszle()
+
+    fraza = request.query_params.get("q")
+    if fraza:
+        qs = qs.szukaj(fraza)
+
+    return Response(TerminWizytySerializer(qs, many=True).data)
+
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def termin_detail(request, pk):
