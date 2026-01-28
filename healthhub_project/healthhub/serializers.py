@@ -1,7 +1,26 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import (ProfilUzytkownika, Pomiar, Aktywnosc, Lek, Lokalizacja, TerminWizyty)
+from .models import ProfilUzytkownika, Pomiar, Aktywnosc, Lek, Lokalizacja, TerminWizyty
+
+class RejestracjaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username", "email", "password"]
+    
+    def validate_username(self, value):
+        if User.objects.filter(username = value).exists():
+            raise serializers.ValidationError("Nie mozna utworzyć konta o istniejącej nazwie uzytkownika.")
+        return value
+    
+    def validate_email(self, value):
+        if value and User.objects.filter(email = value).exists():
+            raise serializers.ValidationError("Nie mozna utworzyć konta o podanym juz adresie e-mail.")
+        return value
+    
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
 
 class ProfilUzytkownikaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,6 +34,11 @@ class ProfilUzytkownikaSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Telefon może zawierać tylko cyfry.")
             if len(value) != 9:
                 raise serializers.ValidationError("Telefon musi mieć 9 cyfr.")
+        return value
+    
+    def validate_data_urodzenia(self, value):
+        if value > timezone.now():
+            raise serializers.ValidationError("Data urodzenia nie może być z przyszłości.")
         return value
 
 class PomiarSerializer(serializers.ModelSerializer):
@@ -48,6 +72,11 @@ class AktywnoscSerializer(serializers.ModelSerializer):
     def validate_czas_trwania_minuty(self, value):
         if value <= 15:
             raise serializers.ValidationError("Czas trwania musi być większy niż 15 minut.")
+        return value
+    
+    def validate_data(self, value):
+        if value < timezone.now():
+            raise serializers.ValidationError("Data aktywności nie może być z przeszłości.")
         return value
 
 class LekSerializer(serializers.ModelSerializer):

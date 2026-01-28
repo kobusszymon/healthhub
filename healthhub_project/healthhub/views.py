@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from .permission import IsUzytkownik
 from .models import ProfilUzytkownika, Pomiar, Lek, Aktywnosc, Lokalizacja, TerminWizyty
-from .serializers import ProfilUzytkownikaSerializer, PomiarSerializer, LekSerializer, AktywnoscSerializer, LokalizacjaSerializer, TerminWizytySerializer
+from .serializers import ProfilUzytkownikaSerializer, PomiarSerializer, LekSerializer, AktywnoscSerializer, LokalizacjaSerializer, TerminWizytySerializer, RejestracjaSerializer
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAdminUser])
@@ -290,13 +290,13 @@ def wolne_terminy_specjalizacja(request):
         specjalizacja = request.query_params.get('specialty', None)
         terminy = TerminWizyty.objects.filter(uzytkownik__isnull = True, data_wizyty__gte = timezone.now(), specjalizacja__icontains = specjalizacja)
         serializer = TerminWizytySerializer(terminy, many = True)
-        if specializacja is not None:
+        if specjalizacja is not None:
             return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['GET'])
 def przyszle_wizyty_uzytkownika(request):
     if request.method == 'GET':
-        terminy = TerminWizyty.objects.filter(uzytkownik__isnull = True, data_wizyty__gte = timezone.now())
+        terminy = TerminWizyty.objects.filter(uzytkownik=request.user, data_wizyty__gte = timezone.now())
         serializer = TerminWizytySerializer(terminy, many = True)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
@@ -338,4 +338,15 @@ def rezerwuj_termin(request, pk):
         if serializer.is_valid():
             serializer.save(uzytkownik=request.user)
             return Response(serializer.data, status = status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def rejestracja(request):
+    if request.method == 'POST':
+        serializer = RejestracjaSerializer(data = request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            ProfilUzytkownika.objects.create(uzytkownik=user)
+            return Response(status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
