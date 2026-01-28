@@ -18,7 +18,7 @@ urlpatterns = [
     path('termin/', views.termin_list_admin, name ='termin-list'),
     path('termin/przyszle', views.przyszle_wizyty_uzytkownika, name = 'przyszle-wizyty-uzytkownka'),
     path('termin/wolne', views.wolne_terminy, name = 'wolne-terminy'),
-    path('termij/wolne/specjalizacja', views.wolne_terminy_specjalizacja),
+    path('termin/wolne/specjalizacja', views.wolne_terminy_specjalizacja),
     path('termin/<int:pk>/', views.termin_detail, name = 'termin-detail'),
     path('termin/<int:pk>/rezerwuj', views.rezerwuj_termin, name = 'rezerwuj-termin'),
 ]
