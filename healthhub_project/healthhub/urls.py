@@ -11,7 +11,9 @@ urlpatterns = [
     path('aktywnosc/', views.aktywnosc_list, name ='aktywnosc-list'),
     path('aktywnosc/<int:pk>/', views.aktywnosc_detail, name = 'aktywnosc-detail'),
     path('lokalizacja/', views.lokalizacja_list, name ='lokalizacja-list'),
+    path('lokalizacja/create', views.lokalizacja_create, name ='lokalizacja-create'),
     path('lokalizacja/<int:pk>/', views.lokalizacja_detail, name = 'lokalizacja-detail'),
+    path('lokalizacja/update_delete/<int:pk>/', views.lokalizacja_update_delete, name = 'lokalizacja_update_delete'),
     path('termin/', views.termin_list, name ='termin-list'),
     path('termin/<int:pk>/', views.termin_detail, name = 'termin-detail'),
 ]
