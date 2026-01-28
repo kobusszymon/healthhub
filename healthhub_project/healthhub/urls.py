@@ -2,8 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('profile/', views.profil_list, name = 'profil-list'),
-    path('profile/<int:pk>/', views.profil_detail, name = 'profil-detail'),
+    path('profil/', views.profil_list, name = 'profil-list'),
+    path('profil/<int:pk>/', views.profil_detail, name = 'profil-detail'),
     path('pomiar/', views.pomiar_list, name ='pomiar-list'),
     path('pomiar/<int:pk>/', views.pomiar_detail, name = 'pomiar-detail'),
     path('lek/', views.lek_list, name ='lek-list'),
@@ -14,6 +14,6 @@ urlpatterns = [
     path('lokalizacja/create', views.lokalizacja_create, name ='lokalizacja-create'),
     path('lokalizacja/<int:pk>/', views.lokalizacja_detail, name = 'lokalizacja-detail'),
     path('lokalizacja/update_delete/<int:pk>/', views.lokalizacja_update_delete, name = 'lokalizacja_update_delete'),
-    path('termin/', views.termin_list, name ='termin-list'),
+    path('termin/', views.termin_list_admin, name ='termin-list'),
     path('termin/<int:pk>/', views.termin_detail, name = 'termin-detail'),
 ]

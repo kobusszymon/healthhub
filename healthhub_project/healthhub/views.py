@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from django.contrib.auth.decorators import permission_required
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from .permission import IsUzytkownik
 from .models import ProfilUzytkownika, Pomiar, Lek, Aktywnosc, Lokalizacja, TerminWizyty
 from .serializers import ProfilUzytkownikaSerializer, PomiarSerializer, LekSerializer, AktywnoscSerializer, LokalizacjaSerializer, TerminWizytySerializer
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAdminUser])
 def profil_list(request):
     if request.method == 'GET':
         profile = ProfilUzytkownika.objects.all()
@@ -29,20 +32,33 @@ def profil_detail(request, pk):
     
     if request.method == 'GET':
         serializer = ProfilUzytkownikaSerializer(profil)
+        if not (
+            IsUzytkownik().has_object_permission(request, None, profil)
+            or IsAdminUser().has_permission(request, None)
+        ):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.data, status = status.HTTP_200_OK)
     
     if request.method == 'PUT':
         serializer = ProfilUzytkownikaSerializer(profil, data = request.data)
+        if not (
+            IsUzytkownik().has_object_permission(request, None, profil)
+            or IsAdminUser().has_permission(request, None)
+        ):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status = status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
     
     elif request.method == 'DELETE':
+        if not IsAdminUser().has_permission(request, None):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         profil.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAdminUser])
 def pomiar_list(request):
     if request.method == 'GET':
         pomiary = Pomiar.objects.all()
@@ -79,6 +95,7 @@ def pomiar_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAdminUser])
 def lek_list(request):
     if request.method == 'GET':
         leki = Lek.objects.all()
@@ -115,6 +132,7 @@ def lek_detail(request, pk):
         return Response(status = status.HTTP_204_NO_CONTENT)
     
 @api_view(['GET', 'POST'])
+@permission_classes([IsAdminUser])
 def aktywnosc_list(request):
     if request.method == 'GET':
         aktywnosci = Aktywnosc.objects.all()
@@ -158,6 +176,7 @@ def lokalizacja_list(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def lokalizacja_create(request):
     serializer = LokalizacjaSerializer(data=request.data)
     if serializer.is_valid():
@@ -177,6 +196,7 @@ def lokalizacja_detail(request, pk):
     return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['PUT', 'DELETE'])
+@permission_classes([IsAdminUser])
 def lokalizacja_update_delete(request, pk):
     try:
         lokalizacja = Lokalizacja.objects.get(pk = pk)
@@ -195,7 +215,8 @@ def lokalizacja_update_delete(request, pk):
         return Response(status = status.HTTP_204_NO_CONTENT)
         
 @api_view(['GET', 'POST'])
-def termin_list(request):
+@permission_classes([IsAdminUser])
+def termin_list_admin(request):
     if request.method == 'GET':
         terminy = TerminWizyty.objects.all()
         serializer = TerminWizytySerializer(terminy, many = True)
