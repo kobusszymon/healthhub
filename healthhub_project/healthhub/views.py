@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from .permission import IsUzytkownik
 from .models import ProfilUzytkownika, Pomiar, Lek, Aktywnosc, Lokalizacja, TerminWizyty
-from .serializers import ProfilUzytkownikaSerializer, PomiarSerializer, LekSerializer, AktywnoscSerializer, LokalizacjaSerializer, TerminWizytySerializer, RejestracjaSerializer
+from .serializers import ProfilUzytkownikaSerializer, PomiarSerializer, LekSerializer, AktywnoscSerializer, LokalizacjaSerializer, TerminWizytySerializer, RejestracjaSerializer, RezerwacjaSerializer
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAdminUser])
@@ -163,6 +163,20 @@ def lek_detail(request, pk):
             return Response(status=status.HTTP_403_FORBIDDEN)
         lek.delete()
         return Response(status = status.HTTP_204_NO_CONTENT)
+    
+@api_view(['GET', 'POST'])
+def lek_uzytkownika(request):
+    if request.method == 'GET':
+        leki = Lek.objects.filter(uzytkownik=request.user)
+        serializer = LekSerializer(leki, many = True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    
+    elif request.method == 'POST':
+        serializer = LekSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save(uzytkownik = request.user)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET', 'POST'])
 @permission_classes([IsAdminUser])
@@ -334,7 +348,7 @@ def rezerwuj_termin(request, pk):
         if termin.uzytkownik is not None:
             return Response({"detail": "Ten termin jest już zajęty przez inną osobę."},
             status=status.HTTP_400_BAD_REQUEST)
-        serializer = TerminWizytySerializer(termin, data = request.data)
+        serializer = RezerwacjaSerializer(termin, data = request.data)
         if serializer.is_valid():
             serializer.save(uzytkownik=request.user)
             return Response(serializer.data, status = status.HTTP_202_ACCEPTED)

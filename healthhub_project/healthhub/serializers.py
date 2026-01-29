@@ -110,3 +110,8 @@ class TerminWizytySerializer(serializers.ModelSerializer):
         if value < timezone.now():
             raise serializers.ValidationError("Nie można utworzyć terminu wizyty w przeszłości.")
         return value
+    
+class RezerwacjaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TerminWizyty
+        fields = ["uzytkownik"]

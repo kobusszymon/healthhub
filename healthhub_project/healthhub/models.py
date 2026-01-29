@@ -76,7 +76,7 @@ class Aktywnosc(models.Model):
         verbose_name_plural = "Aktywności"
 
     def clean(self):
-        if self.czas_trwania_minuty is not None and self.czas_trwania_minuty <= 15:
+        if self.czas_trwania_minuty <= 15:
             raise ValidationError({
                 "czas_trwania_minuty": "Czas trwania musi być większy niż 15 minut."
             })
